@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-webhook-testutil
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager-webhook-testutil
+  template:
+    metadata:
+      labels:
+        app: alertmanager-webhook-testutil
+    spec:
+      containers:
+        - name: alertmanager-webhook-testutil
+          image: quay.io/philipgough/alertmanager-test-webhook-receiver:latest
+          ports:
+            - name: web
+              containerPort: 8080

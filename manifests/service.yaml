@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: alertmanager-webhook-testutil
+  labels:
+    app: alertmanager-webhook-testutil
+spec:
+  selector:
+    app: alertmanager-webhook-testutil
+  ports:
+    - name: web
+      port: 8080
