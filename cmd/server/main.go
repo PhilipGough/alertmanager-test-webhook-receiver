@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -109,7 +108,7 @@ func (s *server) handleWebhook() http.HandlerFunc {
 			return
 		}
 
-		level.Debug(s.logger).Log("msg", "webhook received", "data", fmt.Sprintf("%v", into))
+		level.Debug(s.logger).Log("msg", "webhook received", "data", into)
 
 		id, err := s.idGenerator(into)
 		if err != nil {

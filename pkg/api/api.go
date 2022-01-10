@@ -3,6 +3,8 @@ package api
 // Types are duplicated from https://github.com/prometheus/alertmanager
 // in order to avoid the dependency
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -45,4 +47,12 @@ type MessageResponse struct {
 type MessageEntry struct {
 	ID     string  `json:"id"`
 	Alerts []Alert `json:"alerts"`
+}
+
+func (m Message) String() string {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return fmt.Sprintf("%#v", m)
+	}
+	return string(b)
 }
