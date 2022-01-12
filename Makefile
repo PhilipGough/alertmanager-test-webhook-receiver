@@ -4,7 +4,7 @@ TAG ?=  $(shell git -C $(PROJECT_PATH) rev-parse HEAD)
 
 .PHONY: build
 build:
-	go build -o webhook $(PROJECT_PATH)/cmd/server/main.go
+	go build -ldflags='-s -w' -trimpath -o webhook $(PROJECT_PATH)/cmd/server/main.go
 
 .PHONY: image
 image:

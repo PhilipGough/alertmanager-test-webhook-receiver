@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine as builder
+FROM golang:1.17.6-alpine3.15 as builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY . .
 RUN apk add make && \
     make build
 
-FROM scratch as app
+FROM gcr.io/distroless/base-debian10 as app
 LABEL service="alertmanager-webhook"
 COPY --from=builder /app/webhook /
 
