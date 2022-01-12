@@ -26,12 +26,14 @@ var (
 	listenAddress string
 	logLevel      string
 	storeIDTmpl   string
+	dbPath        string
 )
 
 const (
 	defaultListenAddress   = ":8080"
 	defaultLogLevel        = "info"
 	defaultStoreIDTemplate = `{{ .GroupLabels.alertname }}_{{ .Receiver }}`
+	defaultDbPath          = ""
 )
 
 func main() {
@@ -39,13 +41,20 @@ func main() {
 	flagset.StringVar(&listenAddress, "listen.address", defaultListenAddress, "The network address to listen on")
 	flagset.StringVar(&logLevel, "log.level", defaultLogLevel, "One of 'debug', 'info', 'warn', 'error'")
 	flagset.StringVar(&storeIDTmpl, "id.template", defaultStoreIDTemplate, "The template used to generate the ID for storage")
+	flagset.StringVar(&dbPath, "db.path", defaultDbPath, "The file path to the history store. Empty (default) uses in-memory store")
+
 	flagset.Parse(os.Args[1:])
 
 	logger := setupLogger(logLevel)
+	store, err := store.NewKeyValueStore(dbPath, logger)
+	if err != nil {
+		level.Error(logger).Log("msg", "failed to initialise database", "err", err)
+		os.Exit(1)
+	}
 
 	srv := &server{
 		logger:      logger,
-		store:       store.NewInMemStore(),
+		store:       store,
 		router:      mux.NewRouter(),
 		idGenerator: buildIdGenerator(storeIDTmpl),
 	}
