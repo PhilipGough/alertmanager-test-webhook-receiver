@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+
 	"github.com/dgraph-io/badger/v3"
 	"github.com/philipgough/alertmanager-test-webhook-receiver/pkg/api"
 )
@@ -14,15 +17,18 @@ type KeyValueStore struct {
 
 // NewKeyValueStore creates a new Store at the provided path
 // If path is empty an in-memory database is used
-func NewKeyValueStore(path string) (*KeyValueStore, error) {
+func NewKeyValueStore(path string, logger log.Logger) (*KeyValueStore, error) {
 	var (
 		db  *badger.DB
 		err error
 	)
+	opts := badger.DefaultOptions(path)
+	opts.Logger = &wrappedLogger{logger: logger}
+
 	if path != "" {
-		db, err = badger.Open(badger.DefaultOptions(path))
+		db, err = badger.Open(opts)
 	} else {
-		db, err = badger.Open(badger.DefaultOptions("").WithInMemory(true))
+		db, err = badger.Open(opts.WithInMemory(true))
 	}
 
 	if err != nil {
@@ -121,4 +127,24 @@ func (k *KeyValueStore) toMessageEntry(key, v []byte) (*api.MessageEntry, error)
 		ID:     id,
 		Alerts: alerts,
 	}, nil
+}
+
+type wrappedLogger struct {
+	logger log.Logger
+}
+
+func (l *wrappedLogger) Errorf(f string, v ...interface{}) {
+	level.Error(l.logger).Log("msg", fmt.Sprintf(f, v...))
+}
+
+func (l *wrappedLogger) Warningf(f string, v ...interface{}) {
+	level.Warn(l.logger).Log("msg", fmt.Sprintf(f, v...))
+}
+
+func (l *wrappedLogger) Infof(f string, v ...interface{}) {
+	level.Info(l.logger).Log("msg", fmt.Sprintf(f, v...))
+}
+
+func (l *wrappedLogger) Debugf(f string, v ...interface{}) {
+	level.Debug(l.logger).Log("msg", fmt.Sprintf(f, v...))
 }

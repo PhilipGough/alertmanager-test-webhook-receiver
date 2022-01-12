@@ -1,13 +1,15 @@
 package store
 
 import (
-	"github.com/philipgough/alertmanager-test-webhook-receiver/pkg/api"
 	"reflect"
 	"testing"
+
+	"github.com/go-kit/log"
+	"github.com/philipgough/alertmanager-test-webhook-receiver/pkg/api"
 )
 
 func TestKeyValueStore_Set(t *testing.T) {
-	store, err := NewKeyValueStore("")
+	store, err := NewKeyValueStore("", log.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -18,7 +20,7 @@ func TestKeyValueStore_Set(t *testing.T) {
 }
 
 func TestKeyValueStore_Get(t *testing.T) {
-	store, err := NewKeyValueStore("")
+	store, err := NewKeyValueStore("", log.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +40,7 @@ func TestKeyValueStore_Get(t *testing.T) {
 }
 
 func TestNewKeyValueStore_List(t *testing.T) {
-	store, err := NewKeyValueStore("")
+	store, err := NewKeyValueStore("", log.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
